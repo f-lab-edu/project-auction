@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.auction.flab.application.mapper.AuthMapper">
+
+    <select id="isExistedMember" parameterType="string" resultType="boolean">
+        SELECT IF(COUNT(*) = 1, 1, 0)
+        FROM MEMBER
+        WHERE EMAIL = #{email}
+    </select>
+
+    <select id="selectMemberByEmail" parameterType="string" resultType="com.auction.flab.application.vo.AuthVo">
+        SELECT ID
+             , EMAIL
+             , NAME
+             , PASSWORD
+             , MOBILE_NO
+          FROM MEMBER
+         WHERE EMAIL = #{email}
+    </select>
+
+    <insert id="insertMember" parameterType="com.auction.flab.application.vo.AuthVo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO MEMBER (
+               NAME
+             , EMAIL
+             , PASSWORD
+             , MOBILE_NO
+             , CREATED_DATE
+             , MODIFIED_DATE
+        ) VALUES (
+               #{name}
+             , #{email}
+             , #{password}
+             , #{mobileNo}
+             , now()
+             , now()
+        )
+    </insert>
+
+</mapper>

@@ -1,0 +1,6 @@
+spring:
+  config:
+    import: db-config.yml, jwt-config.yml
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml

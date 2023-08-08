@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.auction.flab.application.mapper.ProjectMapper">
+
+    <select id="selectProject" parameterType="long" resultType="com.auction.flab.application.vo.ProjectVo">
+        SELECT ID
+             , PROPOSER_ID
+             , NAME
+             , AMOUNT
+             , PERIOD
+             , DEADLINE
+             , START_DATE
+             , CONTENT
+             , STATUS
+          FROM PROJECT
+         WHERE ID = #{id}
+    </select>
+
+    <insert id="insertProject" parameterType="com.auction.flab.application.vo.ProjectVo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO PROJECT (
+               PROPOSER_ID
+             , NAME
+             , AMOUNT
+             , PERIOD
+             , DEADLINE
+             , START_DATE
+             , CONTENT
+             , STATUS
+             , CREATED_DATE
+             , MODIFIED_DATE
+        ) VALUES (
+               #{proposerId}
+             , #{name}
+             , #{amount}
+             , #{period}
+             , #{deadline}
+             , #{startDate}
+             , #{content}
+             , #{status}
+             , now()
+             , now()
+        )
+    </insert>
+
+    <update id="updateProject" parameterType="com.auction.flab.application.vo.ProjectVo">
+        UPDATE PROJECT
+           SET NAME = #{name}
+             , AMOUNT = #{amount}
+             , PERIOD = #{period}
+             , DEADLINE = #{deadline}
+             , START_DATE = #{startDate}
+             , CONTENT = #{content}
+             , MODIFIED_DATE = now()
+         WHERE ID = #{id}
+    </update>
+
+    <delete id="deleteProject" parameterType="long">
+        DELETE
+          FROM PROJECT
+         WHERE ID = #{id}
+    </delete>
+
+</mapper>
