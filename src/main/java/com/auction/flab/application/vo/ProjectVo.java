@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProjectVo {
 
     private Long id;
@@ -19,6 +21,8 @@ public class ProjectVo {
     private LocalDateTime startDate;
     private String content;
     private ProjectStatus status;
+    private Integer applicants;
+    private LocalDateTime createdDate;
 
     public static ProjectVo from(ProjectRequestDto projectRequestDto) {
         return ProjectVo.builder()

@@ -1,5 +1,7 @@
 package com.auction.flab.application.web.controller;
 
+import com.auction.flab.application.exception.ErrorCode;
+import com.auction.flab.application.exception.InternalException;
 import com.auction.flab.application.service.ProjectService;
 import com.auction.flab.application.web.dto.ProjectRequestDto;
 import com.auction.flab.application.web.dto.ProjectResponseDto;
@@ -496,7 +498,7 @@ class ProjectControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
     }
 
     @DisplayName("수정 요청 실패 - 요청 ID 없음")
@@ -543,6 +545,70 @@ class ProjectControllerTest {
     void invalid_delete_request_due_to_no_id() throws Exception {
         // when
         ResultActions resultActions = mockMvc.perform(delete("/projects/"));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("목록 조회 요청 성공")
+    @Test
+    void valid_search_list_request() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/projects?page=1&size=10"));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("목록 조회 실패 - page가 1보다 작음")
+    @Test
+    void invvalid_search_list_request_because_page_is_less_than_1() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/projects?page=0&size=10"));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("목록 조회 실패 - size가 1보다 작음")
+    @Test
+    void invvalid_search_list_request_because_size_is_less_than_1() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/projects?page=10&size=0"));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("세부내용 조회 요청 성공")
+    @Test
+    void valid_search_detail_request() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/projects/1"));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("세부내용 조회 요청 실패 - 요청 ID 없음")
+    @Test
+    void invalid_search_detail_request_due_to_no_id() throws Exception {
+        // given
+        Long id = 33333L;
+        given(projectService.getProject(eq(id))).willThrow(new InternalException(ErrorCode.EXCEPTION_ON_NOT_FOUND));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/projects/" + id));
 
         // then
         resultActions

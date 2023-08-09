@@ -4,13 +4,17 @@ import com.auction.flab.application.exception.ErrorCode;
 import com.auction.flab.application.exception.InternalException;
 import com.auction.flab.application.mapper.ProjectMapper;
 import com.auction.flab.application.mapper.ProjectStatus;
+import com.auction.flab.application.vo.PageVo;
 import com.auction.flab.application.vo.ProjectVo;
 import com.auction.flab.application.web.dto.ProjectRequestDto;
 import com.auction.flab.application.web.dto.ProjectResponseDto;
+import com.auction.flab.application.web.dto.ProjectSearchResponseDto;
+import com.auction.flab.application.web.dto.ProjectsSearchResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -18,6 +22,23 @@ import java.util.Optional;
 public class ProjectService {
 
     private final ProjectMapper projectMapper;
+
+    @Transactional(readOnly = true)
+    public ProjectsSearchResponseDto getProjects(int page, int size) {
+        PageVo pageVo = PageVo.from(page, size);
+        List<ProjectSearchResponseDto> projects = projectMapper.selectProjects(pageVo).stream()
+                .map(ProjectSearchResponseDto::from)
+                .toList();
+        pageVo.setTotalCount(projectMapper.selectTotalProjectCount());
+        return ProjectsSearchResponseDto.from(projects, pageVo);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectSearchResponseDto getProject(Long id) {
+        ProjectVo projectVo = Optional.ofNullable(projectMapper.selectProject(id))
+                .orElseThrow(() -> new InternalException(ErrorCode.EXCEPTION_ON_NOT_FOUND));
+        return ProjectSearchResponseDto.from(projectVo);
+    }
 
     @Transactional
     public ProjectResponseDto addProject(ProjectRequestDto projectRequestDto) {

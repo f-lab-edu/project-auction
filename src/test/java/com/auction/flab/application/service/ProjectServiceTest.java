@@ -4,9 +4,12 @@ import com.auction.flab.application.exception.ErrorCode;
 import com.auction.flab.application.exception.InternalException;
 import com.auction.flab.application.mapper.ProjectMapper;
 import com.auction.flab.application.mapper.ProjectStatus;
+import com.auction.flab.application.vo.PageVo;
 import com.auction.flab.application.vo.ProjectVo;
 import com.auction.flab.application.web.dto.ProjectRequestDto;
 import com.auction.flab.application.web.dto.ProjectResponseDto;
+import com.auction.flab.application.web.dto.ProjectSearchResponseDto;
+import com.auction.flab.application.web.dto.ProjectsSearchResponseDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -249,5 +254,58 @@ class ProjectServiceTest {
         assertEquals(ErrorCode.EXCEPTION_ON_DELETE_PROJECT, internalException.getErrorCode());
         then(projectMapper).should(times(1)).selectProject(projectId);
     }
-    
+
+    @DisplayName("프로젝트 목록 조회 성공")
+    @Test
+    void search_project_list_success() {
+        // given
+        int page = 1;
+        int size = 10;
+        PageVo pageVo = PageVo.from(page, size);
+        ProjectVo projectVo = new ProjectVo();
+        projectVo.setId(1L);
+        List<ProjectVo> projects = new ArrayList<>();
+        projects.add(projectVo);
+        given(projectMapper.selectProjects(eq(pageVo))).willReturn(projects);
+
+        // when
+        ProjectsSearchResponseDto projectsSearchResponseDto = projectService.getProjects(page, size);
+
+        // then
+        assertEquals(1L, projectsSearchResponseDto.getData().get(0).getId());
+        then(projectMapper).should(times(1)).selectProjects(eq(pageVo));
+    }
+
+    @DisplayName("프로젝트 세부 조회 성공")
+    @Test
+    void search_project_detail_success() {
+        // given
+        Long projectId = 1L;
+        ProjectVo projectVo = new ProjectVo();
+        projectVo.setId(projectId);
+        given(projectMapper.selectProject(eq(projectId))).willReturn(projectVo);
+
+        // when
+        ProjectSearchResponseDto projectSearchResponseDto = projectService.getProject(projectId);
+
+        // then
+        assertEquals(projectId, projectSearchResponseDto.getId());
+        then(projectMapper).should(times(1)).selectProject(eq(projectId));
+    }
+
+    @DisplayName("프로젝트 세부 조회 실패 - 프로젝트 미존재")
+    @Test
+    void search_project_detail_failed_due_to_no_project() {
+        // given
+        Long projectId = 111L;
+        given(projectMapper.selectProject(eq(projectId))).willReturn(null);
+
+        // when
+        InternalException internalException = assertThrows(InternalException.class, () -> projectService.getProject(projectId));
+
+        // then
+        assertEquals(ErrorCode.EXCEPTION_ON_NOT_FOUND, internalException.getErrorCode());
+        then(projectMapper).should(times(1)).selectProject(projectId);
+    }
+
 }
