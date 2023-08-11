@@ -17,8 +17,8 @@ public class ProjectSearchResponseDto {
     private Long id;
     private Long proposerId;
     private String name;
-    private Integer amount;
-    private Integer period;
+    private int amount;
+    private int period;
     private LocalDateTime deadline;
     private LocalDateTime startDate;
     private String content;

@@ -1,7 +1,7 @@
 package com.auction.flab.application.web.controller;
 
 import com.auction.flab.application.exception.ErrorCode;
-import com.auction.flab.application.exception.InternalException;
+import com.auction.flab.application.exception.ProjectException;
 import com.auction.flab.application.service.ProjectService;
 import com.auction.flab.application.web.dto.ProjectRequestDto;
 import com.auction.flab.application.web.dto.ProjectResponseDto;
@@ -605,7 +605,7 @@ class ProjectControllerTest {
     void invalid_search_detail_request_due_to_no_id() throws Exception {
         // given
         Long id = 33333L;
-        given(projectService.getProject(eq(id))).willThrow(new InternalException(ErrorCode.EXCEPTION_ON_NOT_FOUND));
+        given(projectService.getProject(eq(id))).willThrow(new ProjectException(ErrorCode.EXCEPTION_ON_NOT_FOUND));
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/projects/" + id));

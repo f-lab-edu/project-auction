@@ -1,7 +1,7 @@
 package com.auction.flab.application.validator;
 
 import com.auction.flab.application.exception.ErrorCode;
-import com.auction.flab.application.exception.InternalException;
+import com.auction.flab.application.exception.ProjectException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -33,7 +33,7 @@ public class DateTimeOrderValidator implements ConstraintValidator<DateTimeOrder
             field.setAccessible(true);
             return (LocalDateTime) field.get(object);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new InternalException(ErrorCode.EXCEPTION_ON_EXTRACT_FIELD_VALUE);
+            throw new ProjectException(ErrorCode.EXCEPTION_ON_EXTRACT_FIELD_VALUE);
         }
     }
 

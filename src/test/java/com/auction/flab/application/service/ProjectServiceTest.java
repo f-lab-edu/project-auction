@@ -1,7 +1,7 @@
 package com.auction.flab.application.service;
 
 import com.auction.flab.application.exception.ErrorCode;
-import com.auction.flab.application.exception.InternalException;
+import com.auction.flab.application.exception.ProjectException;
 import com.auction.flab.application.mapper.ProjectMapper;
 import com.auction.flab.application.mapper.ProjectStatus;
 import com.auction.flab.application.vo.PageVo;
@@ -92,10 +92,10 @@ class ProjectServiceTest {
         given(projectMapper.insertProject(eq(ProjectVo.from(projectRequestDto)))).willReturn(1);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> projectService.addProject(projectRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectService.addProject(projectRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_INPUT_PROJECT, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_INPUT_PROJECT, projectException.getErrorCode());
         then(projectMapper).should(times(1)).insertProject(eq(ProjectVo.from(projectRequestDto)));
     }
 
@@ -144,10 +144,10 @@ class ProjectServiceTest {
         given(projectMapper.selectProject(eq(projectId))).willReturn(null);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> projectService.updateProject(projectId, projectRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectService.updateProject(projectId, projectRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_UPDATE_PROJECT, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_UPDATE_PROJECT, projectException.getErrorCode());
         then(projectMapper).should(times(1)).selectProject(projectId);
     }
 
@@ -170,10 +170,10 @@ class ProjectServiceTest {
         given(projectMapper.selectProject(eq(projectId))).willReturn(projectVo);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> projectService.updateProject(projectId, projectRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectService.updateProject(projectId, projectRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_UPDATE_PROJECT, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_UPDATE_PROJECT, projectException.getErrorCode());
         then(projectMapper).should(times(1)).selectProject(projectId);
     }
 
@@ -221,10 +221,10 @@ class ProjectServiceTest {
         given(projectMapper.selectProject(eq(projectId))).willReturn(null);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> projectService.deleteProject(projectId));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectService.deleteProject(projectId));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_DELETE_PROJECT, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_DELETE_PROJECT, projectException.getErrorCode());
         then(projectMapper).should(times(1)).selectProject(projectId);
     }
 
@@ -248,10 +248,10 @@ class ProjectServiceTest {
         given(projectMapper.selectProject(eq(projectId))).willReturn(projectVo);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> projectService.deleteProject(projectId));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectService.deleteProject(projectId));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_DELETE_PROJECT, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_DELETE_PROJECT, projectException.getErrorCode());
         then(projectMapper).should(times(1)).selectProject(projectId);
     }
 
@@ -301,10 +301,10 @@ class ProjectServiceTest {
         given(projectMapper.selectProject(eq(projectId))).willReturn(null);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> projectService.getProject(projectId));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectService.getProject(projectId));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_NOT_FOUND, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_NOT_FOUND, projectException.getErrorCode());
         then(projectMapper).should(times(1)).selectProject(projectId);
     }
 
