@@ -465,7 +465,7 @@ class AuthControllerTest {
         resultActions
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value("test_token"));
+                .andExpect(jsonPath("$.access_token").value("test_token"));
     }
 
 }

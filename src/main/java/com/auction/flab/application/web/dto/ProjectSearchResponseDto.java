@@ -1,6 +1,8 @@
 package com.auction.flab.application.web.dto;
 
 import com.auction.flab.application.vo.ProjectVo;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
 @Data
 @AllArgsConstructor

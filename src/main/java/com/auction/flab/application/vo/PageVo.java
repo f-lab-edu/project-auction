@@ -1,8 +1,11 @@
 package com.auction.flab.application.vo;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
 @Data
 public class PageVo {
