@@ -3,18 +3,50 @@
 
 <mapper namespace="com.auction.flab.application.mapper.ProjectMapper">
 
-    <select id="selectProject" parameterType="long" resultType="com.auction.flab.application.vo.ProjectVo">
-        SELECT ID
-             , PROPOSER_ID
-             , NAME
-             , AMOUNT
-             , PERIOD
-             , DEADLINE
-             , START_DATE
-             , CONTENT
-             , STATUS
+    <select id="selectProjects" parameterType="com.auction.flab.application.vo.PageVo" resultType="com.auction.flab.application.vo.ProjectVo">
+        SELECT A.ID
+             , A.NAME
+             , A.AMOUNT
+             , A.PERIOD
+             , A.DEADLINE
+             , A.START_DATE
+             , A.CONTENT
+             , A.STATUS
+             , A.PROPOSER_ID
+             , (
+                SELECT COUNT(*)
+                  FROM PROJECT_APPLICANTS S
+                 WHERE S.ID = A.ID
+               ) AS APPLICANTS
+             , A.CREATED_DATE
+          FROM PROJECT A
+         ORDER BY CREATED_DATE DESC
+         LIMIT ${page}, ${size}
+    </select>
+
+    <select id="selectTotalProjectCount" resultType="int">
+        SELECT COUNT(ID) AS CNT
           FROM PROJECT
-         WHERE ID = #{id}
+    </select>
+
+    <select id="selectProject" parameterType="long" resultType="com.auction.flab.application.vo.ProjectVo">
+        SELECT A.ID
+             , A.NAME
+             , A.AMOUNT
+             , A.PERIOD
+             , A.DEADLINE
+             , A.START_DATE
+             , A.CONTENT
+             , A.STATUS
+             , A.PROPOSER_ID
+             , (
+                SELECT COUNT(*)
+                  FROM PROJECT_APPLICANTS S
+                 WHERE S.ID = A.ID
+               ) AS APPLICANTS
+             , A.CREATED_DATE
+          FROM PROJECT A
+         WHERE A.ID = #{id}
     </select>
 
     <insert id="insertProject" parameterType="com.auction.flab.application.vo.ProjectVo" useGeneratedKeys="true" keyProperty="id">

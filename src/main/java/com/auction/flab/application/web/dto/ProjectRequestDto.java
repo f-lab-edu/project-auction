@@ -1,16 +1,20 @@
 package com.auction.flab.application.web.dto;
 
 import com.auction.flab.application.validator.DateTimeOrder;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @DateTimeOrder(previousDateTime = "deadline", laterDateTime = "startDate")
 @Builder
 @Data

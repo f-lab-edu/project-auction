@@ -1,7 +1,7 @@
 package com.auction.flab.application.service;
 
 import com.auction.flab.application.exception.ErrorCode;
-import com.auction.flab.application.exception.InternalException;
+import com.auction.flab.application.exception.ProjectException;
 import com.auction.flab.application.mapper.AuthMapper;
 import com.auction.flab.application.util.TokenUtil;
 import com.auction.flab.application.vo.AuthVo;
@@ -73,10 +73,10 @@ class AuthServiceTest {
         given(authMapper.isExistedMember(eq(signUpRequestDto.getEmail()))).willReturn(true);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> authService.signUp(signUpRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> authService.signUp(signUpRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_INPUT_MEMBER, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_INPUT_MEMBER, projectException.getErrorCode());
         then(authMapper).should(times(1)).isExistedMember(eq(signUpRequestDto.getEmail()));
     }
 
@@ -93,10 +93,10 @@ class AuthServiceTest {
         given(bCryptPasswordEncoder.encode(eq(signUpRequestDto.getPassword()))).willReturn(signUpRequestDto.getPassword());
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> authService.signUp(signUpRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> authService.signUp(signUpRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_INPUT_MEMBER, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_INPUT_MEMBER, projectException.getErrorCode());
         then(authMapper).should(times(1)).insertMember(eq(AuthVo.from(signUpRequestDto)));
     }
 
@@ -131,10 +131,10 @@ class AuthServiceTest {
         given(authMapper.selectMemberByEmail(eq(authVo.getEmail()))).willReturn(null);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> authService.signIn(signInRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> authService.signIn(signInRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_LOGIN, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_LOGIN, projectException.getErrorCode());
         then(authMapper).should(times(1)).selectMemberByEmail(eq(authVo.getEmail()));
     }
 
@@ -150,10 +150,10 @@ class AuthServiceTest {
         given(bCryptPasswordEncoder.matches(eq(authVo.getPassword()), anyString())).willReturn(false);
 
         // when
-        InternalException internalException = assertThrows(InternalException.class, () -> authService.signIn(signInRequestDto));
+        ProjectException projectException = assertThrows(ProjectException.class, () -> authService.signIn(signInRequestDto));
 
         // then
-        assertEquals(ErrorCode.EXCEPTION_ON_LOGIN, internalException.getErrorCode());
+        assertEquals(ErrorCode.EXCEPTION_ON_LOGIN, projectException.getErrorCode());
         then(authMapper).should(times(1)).selectMemberByEmail(eq(authVo.getEmail()));
         then(bCryptPasswordEncoder).should(times(1)).matches(eq(authVo.getPassword()), anyString());
     }
