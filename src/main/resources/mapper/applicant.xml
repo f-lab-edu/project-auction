@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.auction.flab.application.mapper.ProjectApplicantMapper">
+
+    <select id="isExistedProject" parameterType="long" resultType="boolean">
+        SELECT IF(COUNT(*) = 1, true, false)
+          FROM PROJECT
+         WHERE ID = #{id}
+    </select>
+
+    <select id="selectProjectApplicants" parameterType="long" resultType="com.auction.flab.application.vo.ProjectApplicantVo">
+        SELECT A.ID AS PROJECT_ID
+             , A.APPLICANT_ID
+             , C.EMAIL
+             , A.AMOUNT
+             , A.PERIOD
+          FROM PROJECT_APPLICANTS A
+          JOIN APPLICANT B
+            ON B.ID = A.APPLICANT_ID
+          JOIN MEMBER C
+            ON C.ID = B.MEMBER_NO
+         WHERE A.ID = #{id}
+    </select>
+
+    <select id="selectProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo" resultType="com.auction.flab.application.vo.ProjectApplicantVo">
+        SELECT A.ID AS PROJECT_ID
+             , A.NAME
+             , A.AMOUNT
+             , A.PERIOD
+             , A.DEADLINE
+             , A.CONTENT
+             , B.APPLICANT_ID
+             , B.AMOUNT AS ORDER_AMOUNT
+             , B.PERIOD AS EXECUTION_PERIOD
+             , B.CONTENT AS SUPPORT_CONTENT
+             , D.EMAIL
+          FROM PROJECT A
+          JOIN PROJECT_APPLICANTS B
+            ON B.ID = A.ID
+          JOIN APPLICANT C
+            ON C.ID = B.APPLICANT_ID
+          JOIN MEMBER D
+            ON D.ID = C.MEMBER_NO
+         WHERE A.ID = #{projectId}
+           AND B.APPLICANT_ID = #{applicantId}
+    </select>
+
+</mapper>
