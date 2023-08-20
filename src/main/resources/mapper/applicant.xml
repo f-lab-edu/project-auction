@@ -9,18 +9,24 @@
          WHERE ID = #{id}
     </select>
 
+    <select id="isExistedApplicant" parameterType="long" resultType="boolean">
+        SELECT IF(COUNT(*) = 1, true, false)
+          FROM APPLICANT
+         WHERE ID = #{id}
+    </select>
+
     <select id="selectProjectApplicants" parameterType="long" resultType="com.auction.flab.application.vo.ProjectApplicantVo">
         SELECT A.ID AS PROJECT_ID
              , A.APPLICANT_ID
              , C.EMAIL
              , A.AMOUNT
              , A.PERIOD
-          FROM PROJECT_APPLICANTS A
+          FROM PROJECT_APPLICANT A
           JOIN APPLICANT B
-            ON B.ID = A.APPLICANT_ID
+            ON B.PROJECT_ID = A.APPLICANT_ID
           JOIN MEMBER C
             ON C.ID = B.MEMBER_NO
-         WHERE A.ID = #{id}
+         WHERE A.PROJECT_ID = #{projectId}
     </select>
 
     <select id="selectProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo" resultType="com.auction.flab.application.vo.ProjectApplicantVo">
@@ -34,10 +40,11 @@
              , B.AMOUNT AS ORDER_AMOUNT
              , B.PERIOD AS EXECUTION_PERIOD
              , B.CONTENT AS SUPPORT_CONTENT
+             , B.STATUS
              , D.EMAIL
           FROM PROJECT A
-          JOIN PROJECT_APPLICANTS B
-            ON B.ID = A.ID
+          JOIN PROJECT_APPLICANT B
+            ON B.PROJECT_ID = A.ID
           JOIN APPLICANT C
             ON C.ID = B.APPLICANT_ID
           JOIN MEMBER D
@@ -45,5 +52,34 @@
          WHERE A.ID = #{projectId}
            AND B.APPLICANT_ID = #{applicantId}
     </select>
+
+    <insert id="insertProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo">
+        INSERT INTO PROJECT_APPLICANT (
+               PROJECT_ID
+             , APPLICANT_ID
+             , AMOUNT
+             , PERIOD
+             , CONTENT
+             , STATUS
+             , CREATED_DATE
+             , MODIFIED_DATE
+        ) VALUES (
+               #{projectId}
+             , #{applicantId}
+             , #{amount}
+             , #{period}
+             , #{content}
+             , #{status}
+             , now()
+             , now()
+        )
+    </insert>
+
+    <update id="updateProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo">
+        UPDATE PROJECT_APPLICANT
+           SET STATUS = #{status}
+         WHERE PROJECT_ID = #{projectId}
+           AND APPLICANT_ID = #{applicantId}
+    </update>
 
 </mapper>

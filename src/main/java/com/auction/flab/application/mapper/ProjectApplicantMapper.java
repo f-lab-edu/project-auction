@@ -8,10 +8,16 @@ import java.util.List;
 @Mapper
 public interface ProjectApplicantMapper {
 
-    boolean isExistedProject(Long id);
+    boolean isExistedProject(Long projectId);
+
+    boolean isExistedApplicant(Long applicantId);
 
     List<ProjectApplicantVo> selectProjectApplicants(Long id);
 
     ProjectApplicantVo selectProjectApplicant(ProjectApplicantVo projectApplicantVo);
+
+    int insertProjectApplicant(ProjectApplicantVo projectApplicantVo);
+
+    int updateProjectApplicant(ProjectApplicantVo projectApplicantVo);
 
 }
