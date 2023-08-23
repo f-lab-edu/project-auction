@@ -3,6 +3,7 @@ package com.auction.flab.application.service;
 import com.auction.flab.application.exception.ErrorCode;
 import com.auction.flab.application.exception.ProjectException;
 import com.auction.flab.application.mapper.ProjectApplicantMapper;
+import com.auction.flab.application.mapper.ProjectApplicantStatus;
 import com.auction.flab.application.vo.ProjectApplicantVo;
 import com.auction.flab.application.web.dto.ProjectApplicantSearchResponseDto;
 import com.auction.flab.application.web.dto.ProjectApplicantsSearchResponseDto;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -123,6 +125,208 @@ class ProjectApplicantServiceTest {
         // then
         assertEquals(ErrorCode.EXCEPTION_ON_NOT_FOUND, projectException.getErrorCode());
         then(projectApplicantMapper).should(times(1)).selectProjectApplicant(projectApplicantVo);
+    }
+
+    @DisplayName("프로젝트 지원 성공")
+    @Test
+    void applying_project_success() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.selectProjectApplicant(any(ProjectApplicantVo.class)))
+                .willReturn(null);
+
+        // when
+        projectApplicantService.addProjectApplicant(projectApplicantVo);
+
+        // then
+        then(projectApplicantMapper).should(times(1)).insertProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원 실패 - 유효하지 않은 프로젝트 ID")
+    @Test
+    void applying_project_fail_due_to_invalid_project_id() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(false);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.addProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).insertProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원 실패 - 유효하지 않은 지원자 ID")
+    @Test
+    void applying_project_fail_due_to_invalid_applicant_id() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(false);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.addProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).insertProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원 실패 - 지원 내역 존재")
+    @Test
+    void applying_project_fail_due_to_duplication() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.selectProjectApplicant(any(ProjectApplicantVo.class)))
+                .willReturn(projectApplicantVo);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.addProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).insertProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원자 확정 성공")
+    @Test
+    void confirm_project_applicant_success() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .status(ProjectApplicantStatus.APPLYING)
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.selectProjectApplicant(any(ProjectApplicantVo.class)))
+                .willReturn(projectApplicantVo);
+
+        // when
+        projectApplicantService.confirmProjectApplicant(projectApplicantVo);
+
+        // then
+        then(projectApplicantMapper).should(times(1)).updateProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원자 확정 실패 - 유효하지 않은 프로젝트 ID")
+    @Test
+    void confirm_project_applicant_fail_due_to_invalid_project_id() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .status(ProjectApplicantStatus.APPLYING)
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(false);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.confirmProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).updateProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원자 확정 실패 - 유효하지 않은 지원자 ID")
+    @Test
+    void confirm_project_applicant_fail_due_to_invalid_applicant_id() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .status(ProjectApplicantStatus.APPLYING)
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(false);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.confirmProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).updateProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원자 확정 실패 - 지원 내역 없음")
+    @Test
+    void confirm_project_applicant_fail_due_to_no_applying_history() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .status(ProjectApplicantStatus.APPLYING)
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.selectProjectApplicant(any(ProjectApplicantVo.class)))
+                .willReturn(null);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.confirmProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).updateProjectApplicant(eq(projectApplicantVo));
+    }
+
+    @DisplayName("프로젝트 지원자 확정 실패 - 이미 확정된 상태")
+    @Test
+    void confirm_project_applicant_fail_beacuase_already_confirmed() {
+        // given
+        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.builder()
+                .projectId(1L)
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .status(ProjectApplicantStatus.CONFIRMATION)
+                .build();
+        given(projectApplicantMapper.isExistedProject(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.isExistedApplicant(eq(1L))).willReturn(true);
+        given(projectApplicantMapper.selectProjectApplicant(any(ProjectApplicantVo.class)))
+                .willReturn(projectApplicantVo);
+
+        // when
+        ProjectException projectException = assertThrows(ProjectException.class, () -> projectApplicantService.confirmProjectApplicant(projectApplicantVo));
+
+        // then
+        then(projectApplicantMapper).should(times(0)).updateProjectApplicant(eq(projectApplicantVo));
     }
     
 }

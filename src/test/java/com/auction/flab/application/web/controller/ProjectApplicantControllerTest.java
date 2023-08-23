@@ -4,6 +4,7 @@ import com.auction.flab.application.exception.ErrorCode;
 import com.auction.flab.application.exception.ProjectException;
 import com.auction.flab.application.service.ProjectApplicantService;
 import com.auction.flab.application.vo.ProjectApplicantVo;
+import com.auction.flab.application.web.dto.ProjectApplicantRequestDto;
 import com.auction.flab.application.web.dto.ProjectApplicantSearchResponseDto;
 import com.auction.flab.application.web.dto.ProjectApplicantsSearchResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,15 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -170,6 +173,267 @@ class ProjectApplicantControllerTest {
         resultActions
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("프로젝트 지원 요청 성공")
+    @Test
+    void valid_insert_request() throws Exception {
+        // given
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isCreated());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 지원자 ID가 null 인 경우")
+    @Test
+    void invalid_applicantId_with_null() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(null)
+                .amount(3_100)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 예상금액이 null 인 경우")
+    @Test
+    void invalid_amount_with_null() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(null)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 예상금액이 최대 금액을 넘어서는 경우")
+    @Test
+    void invalid_amount_above_the_maximum() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(100_001)
+                .period(110)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 예상기간이 null인 경우")
+    @Test
+    void invalid_period_with_null() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(null)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 예상기간이 최소기간 미만인 경우")
+    @Test
+    void invalid_period_below_the_minimum() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(0)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 예상기간이 최대기간 초과인 경우")
+    @Test
+    void invalid_period_above_the_maximum() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(1_001)
+                .content("이러 저러하게 작업할 예정입니다.")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 업무내용이 null인 경우")
+    @Test
+    void invalid_content_with_null() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content(null)
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 업무내용이 공백인 경우")
+    @Test
+    void invalid_content_with_empty() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 업무내용이 빈칸만 존재하는 경우")
+    @Test
+    void invalid_content_with_blank() throws Exception {
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content("     ")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원 요청 실패 - 업무내용이 최대길이 초과인 경우")
+    @Test
+    void invalid_content_beyond_maximum_length() throws Exception {
+        String[] contents = new String[2001];
+        Arrays.fill(contents, "a");
+        long projectId = 1L;
+        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
+                .applicantId(1L)
+                .amount(3_100)
+                .period(110)
+                .content(String.join("", contents))
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("프로젝트 지원자 확정 요청 성공")
+    @Test
+    void valid_project_applicant_confirm_request() throws Exception {
+        // given
+        long projectId = 1L;
+        long applicantId = 1L;
+
+        // when
+        ResultActions resultActions = mockMvc.perform(put("/projects/" + projectId + "/applicants/" + applicantId));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
 }
