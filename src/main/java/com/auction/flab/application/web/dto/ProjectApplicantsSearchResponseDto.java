@@ -1,33 +1,29 @@
 package com.auction.flab.application.web.dto;
 
-import com.auction.flab.application.vo.ProjectApplicantVo;
+import com.auction.flab.application.vo.ProjectApplicantResultVo;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ProjectApplicantsSearchResponseDto {
 
-    private Long projectId;
-    private Long applicantId;
+    private long projectId;
+    private long applicantId;
     private int amount;
     private int period;
     private String email;
 
-    public static ProjectApplicantsSearchResponseDto from(ProjectApplicantVo projectApplicantVo) {
+    public static ProjectApplicantsSearchResponseDto from(ProjectApplicantResultVo projectApplicantResultVo) {
         return ProjectApplicantsSearchResponseDto.builder()
-                .projectId(projectApplicantVo.getProjectId())
-                .applicantId(projectApplicantVo.getApplicantId())
-                .email(projectApplicantVo.getEmail())
-                .amount(projectApplicantVo.getAmount())
-                .period(projectApplicantVo.getPeriod())
+                .projectId(projectApplicantResultVo.getProjectId())
+                .applicantId(projectApplicantResultVo.getApplicantId())
+                .email(projectApplicantResultVo.getEmail())
+                .amount(projectApplicantResultVo.getAmount())
+                .period(projectApplicantResultVo.getPeriod())
                 .build();
     }
 

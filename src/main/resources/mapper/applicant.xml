@@ -15,21 +15,21 @@
          WHERE ID = #{id}
     </select>
 
-    <select id="selectProjectApplicants" parameterType="long" resultType="com.auction.flab.application.vo.ProjectApplicantVo">
-        SELECT A.ID AS PROJECT_ID
+    <select id="selectProjectApplicants" parameterType="long" resultType="com.auction.flab.application.vo.ProjectApplicantResultVo">
+        SELECT A.PROJECT_ID
              , A.APPLICANT_ID
              , C.EMAIL
              , A.AMOUNT
              , A.PERIOD
           FROM PROJECT_APPLICANT A
           JOIN APPLICANT B
-            ON B.PROJECT_ID = A.APPLICANT_ID
+            ON B.ID = A.APPLICANT_ID
           JOIN MEMBER C
             ON C.ID = B.MEMBER_NO
          WHERE A.PROJECT_ID = #{projectId}
     </select>
 
-    <select id="selectProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo" resultType="com.auction.flab.application.vo.ProjectApplicantVo">
+    <select id="selectProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantSelVo" resultType="com.auction.flab.application.vo.ProjectApplicantResultVo">
         SELECT A.ID AS PROJECT_ID
              , A.NAME
              , A.AMOUNT
@@ -53,7 +53,7 @@
            AND B.APPLICANT_ID = #{applicantId}
     </select>
 
-    <insert id="insertProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo">
+    <insert id="insertProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantAddVo">
         INSERT INTO PROJECT_APPLICANT (
                PROJECT_ID
              , APPLICANT_ID
@@ -75,7 +75,7 @@
         )
     </insert>
 
-    <update id="updateProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantVo">
+    <update id="updateProjectApplicant" parameterType="com.auction.flab.application.vo.ProjectApplicantModVo">
         UPDATE PROJECT_APPLICANT
            SET STATUS = #{status}
          WHERE PROJECT_ID = #{projectId}

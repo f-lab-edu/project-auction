@@ -1,6 +1,9 @@
 package com.auction.flab.application.mapper;
 
-import com.auction.flab.application.vo.ProjectApplicantVo;
+import com.auction.flab.application.vo.ProjectApplicantAddVo;
+import com.auction.flab.application.vo.ProjectApplicantModVo;
+import com.auction.flab.application.vo.ProjectApplicantResultVo;
+import com.auction.flab.application.vo.ProjectApplicantSelVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -8,16 +11,16 @@ import java.util.List;
 @Mapper
 public interface ProjectApplicantMapper {
 
-    boolean isExistedProject(Long projectId);
+    boolean isExistedProject(long projectId);
 
-    boolean isExistedApplicant(Long applicantId);
+    boolean isExistedApplicant(long applicantId);
 
-    List<ProjectApplicantVo> selectProjectApplicants(Long id);
+    List<ProjectApplicantResultVo> selectProjectApplicants(long projectId);
 
-    ProjectApplicantVo selectProjectApplicant(ProjectApplicantVo projectApplicantVo);
+    ProjectApplicantResultVo selectProjectApplicant(ProjectApplicantSelVo projectApplicantSelVo);
 
-    int insertProjectApplicant(ProjectApplicantVo projectApplicantVo);
+    int insertProjectApplicant(ProjectApplicantAddVo projectApplicantAddVo);
 
-    int updateProjectApplicant(ProjectApplicantVo projectApplicantVo);
+    int updateProjectApplicant(ProjectApplicantModVo projectApplicantModVo);
 
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectApplicantVo {
+public class ProjectApplicantResultVo {
 
     private Long projectId;
     private Long applicantId;
@@ -25,20 +25,20 @@ public class ProjectApplicantVo {
     private String supportContent;
     private ProjectApplicantStatus status;
 
-    public static ProjectApplicantVo from (Long projectId, Long applicantId) {
-        return ProjectApplicantVo.builder().projectId(projectId).applicantId(applicantId).build();
+    public static ProjectApplicantResultVo from (Long projectId, Long applicantId) {
+        return ProjectApplicantResultVo.builder().projectId(projectId).applicantId(applicantId).build();
     }
 
-    public static ProjectApplicantVo from (Long projectId, Long applicantId, ProjectApplicantStatus status) {
-        return ProjectApplicantVo.builder()
+    public static ProjectApplicantResultVo from (Long projectId, Long applicantId, ProjectApplicantStatus status) {
+        return ProjectApplicantResultVo.builder()
                 .projectId(projectId)
                 .applicantId(applicantId)
                 .status(status)
                 .build();
     }
 
-    public static ProjectApplicantVo from (Long projectId, ProjectApplicantRequestDto projectApplicantRequestDto) {
-        return ProjectApplicantVo.builder()
+    public static ProjectApplicantResultVo from (Long projectId, ProjectApplicantRequestDto projectApplicantRequestDto) {
+        return ProjectApplicantResultVo.builder()
                 .projectId(projectId)
                 .applicantId(projectApplicantRequestDto.getApplicantId())
                 .amount(projectApplicantRequestDto.getAmount())

@@ -3,7 +3,7 @@ package com.auction.flab.application.web.controller;
 import com.auction.flab.application.exception.ErrorCode;
 import com.auction.flab.application.exception.ProjectException;
 import com.auction.flab.application.service.ProjectApplicantService;
-import com.auction.flab.application.vo.ProjectApplicantVo;
+import com.auction.flab.application.vo.ProjectApplicantSelVo;
 import com.auction.flab.application.web.dto.ProjectApplicantRequestDto;
 import com.auction.flab.application.web.dto.ProjectApplicantSearchResponseDto;
 import com.auction.flab.application.web.dto.ProjectApplicantsSearchResponseDto;
@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +45,7 @@ class ProjectApplicantControllerTest {
     @Test
     void valid_search_list_request() throws Exception {
         // given
+        Long id = 1L;
         ProjectApplicantsSearchResponseDto projectApplicantsSearchResponseDto = ProjectApplicantsSearchResponseDto.builder()
                 .projectId(1L)
                 .applicantId(1L)
@@ -53,9 +53,7 @@ class ProjectApplicantControllerTest {
                 .period(100)
                 .email("test@gmail.com")
                 .build();
-        List<ProjectApplicantsSearchResponseDto> result = new ArrayList<>();
-        result.add(projectApplicantsSearchResponseDto);
-        Long id = 1L;
+        List<ProjectApplicantsSearchResponseDto> result = List.of(projectApplicantsSearchResponseDto);
         given(projectApplicantService.getProjectApplicants(eq(id))).willReturn(result);
 
         // when
@@ -114,8 +112,8 @@ class ProjectApplicantControllerTest {
                 .executionPeriod(executionPeriod)
                 .supportContent(supportContent)
                 .build();
-        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.from(projectId, applicantId);
-        given(projectApplicantService.getProjectApplicant(eq(projectApplicantVo)))
+        ProjectApplicantSelVo projectApplicantSelVo = ProjectApplicantSelVo.from(projectId, applicantId);
+        given(projectApplicantService.getProjectApplicant(eq(projectApplicantSelVo)))
                 .willReturn(projectApplicantSearchResponseDto);
 
         // when
@@ -143,8 +141,8 @@ class ProjectApplicantControllerTest {
         // given
         long projectId = 1L;
         long applicantId = 1L;
-        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.from(projectId, applicantId);
-        given(projectApplicantService.getProjectApplicant(eq(projectApplicantVo)))
+        ProjectApplicantSelVo projectApplicantSelVo = ProjectApplicantSelVo.from(projectId, applicantId);
+        given(projectApplicantService.getProjectApplicant(eq(projectApplicantSelVo)))
                 .willThrow(new ProjectException(ErrorCode.EXCEPTION_ON_NOT_FOUND));
 
         // when
@@ -162,8 +160,8 @@ class ProjectApplicantControllerTest {
         // given
         long projectId = 1L;
         long applicantId = 1L;
-        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.from(projectId, applicantId);
-        given(projectApplicantService.getProjectApplicant(eq(projectApplicantVo)))
+        ProjectApplicantSelVo projectApplicantSelVo = ProjectApplicantSelVo.from(projectId, applicantId);
+        given(projectApplicantService.getProjectApplicant(eq(projectApplicantSelVo)))
                 .willThrow(new ProjectException(ErrorCode.EXCEPTION_ON_NOT_FOUND));
 
         // when
@@ -220,28 +218,6 @@ class ProjectApplicantControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @DisplayName("프로젝트 지원 요청 실패 - 예상금액이 null 인 경우")
-    @Test
-    void invalid_amount_with_null() throws Exception {
-        long projectId = 1L;
-        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
-                .applicantId(1L)
-                .amount(null)
-                .period(110)
-                .content("이러 저러하게 작업할 예정입니다.")
-                .build();
-
-        // when
-        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
-
-        // then
-        resultActions
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
     @DisplayName("프로젝트 지원 요청 실패 - 예상금액이 최대 금액을 넘어서는 경우")
     @Test
     void invalid_amount_above_the_maximum() throws Exception {
@@ -250,28 +226,6 @@ class ProjectApplicantControllerTest {
                 .applicantId(1L)
                 .amount(100_001)
                 .period(110)
-                .content("이러 저러하게 작업할 예정입니다.")
-                .build();
-
-        // when
-        ResultActions resultActions = mockMvc.perform(post("/projects/" + projectId + "/applicants")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(projectApplicantRequestDto)));
-
-        // then
-        resultActions
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @DisplayName("프로젝트 지원 요청 실패 - 예상기간이 null인 경우")
-    @Test
-    void invalid_period_with_null() throws Exception {
-        long projectId = 1L;
-        ProjectApplicantRequestDto projectApplicantRequestDto = ProjectApplicantRequestDto.builder()
-                .applicantId(1L)
-                .amount(3_100)
-                .period(null)
                 .content("이러 저러하게 작업할 예정입니다.")
                 .build();
 

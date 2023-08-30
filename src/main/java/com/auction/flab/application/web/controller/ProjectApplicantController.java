@@ -1,8 +1,8 @@
 package com.auction.flab.application.web.controller;
 
-import com.auction.flab.application.mapper.ProjectApplicantStatus;
 import com.auction.flab.application.service.ProjectApplicantService;
-import com.auction.flab.application.vo.ProjectApplicantVo;
+import com.auction.flab.application.vo.ProjectApplicantAddVo;
+import com.auction.flab.application.vo.ProjectApplicantSelVo;
 import com.auction.flab.application.web.dto.ProjectApplicantRequestDto;
 import com.auction.flab.application.web.dto.ProjectApplicantSearchResponseDto;
 import com.auction.flab.application.web.dto.ProjectApplicantsSearchResponseDto;
@@ -27,21 +27,20 @@ public class ProjectApplicantController {
 
     @GetMapping("/projects/{project-id}/applicants/{applicant-id}")
     public ResponseEntity<ProjectApplicantSearchResponseDto> getProjectApplicant(@PathVariable("project-id") Long projectId, @PathVariable("applicant-id") Long applicantId) {
-        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.from(projectId, applicantId);
-        return new ResponseEntity<>(projectApplicantService.getProjectApplicant(projectApplicantVo), HttpStatus.OK);
+        ProjectApplicantSelVo projectApplicantSelVo = ProjectApplicantSelVo.from(projectId, applicantId);
+        return new ResponseEntity<>(projectApplicantService.getProjectApplicant(projectApplicantSelVo), HttpStatus.OK);
     }
 
     @PostMapping("/projects/{project-id}/applicants")
     public ResponseEntity<Void> addProjectApplicant(@PathVariable("project-id") Long projectId, @Valid @RequestBody ProjectApplicantRequestDto projectApplicantRequestDto) {
-        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.from(projectId, projectApplicantRequestDto);
+        ProjectApplicantAddVo projectApplicantVo = ProjectApplicantAddVo.from(projectId, projectApplicantRequestDto);
         projectApplicantService.addProjectApplicant(projectApplicantVo);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/projects/{project-id}/applicants/{applicant-id}")
     public ResponseEntity<Void> confirmProjectApplicant(@PathVariable("project-id") Long projectId, @PathVariable("applicant-id") Long applicantId) {
-        ProjectApplicantVo projectApplicantVo = ProjectApplicantVo.from(projectId, applicantId, ProjectApplicantStatus.CONFIRMATION);
-        projectApplicantService.confirmProjectApplicant(projectApplicantVo);
+        projectApplicantService.confirmProjectApplicant(projectId, applicantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
